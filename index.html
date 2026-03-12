@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💰 Калькулятор фінансів салону | Beauty Маніфест</title>
+<style>
+  :root {
+    --cherry: #C0324B;
+    --cherry-dark: #9B1F38;
+    --cherry-light: #F9E8EC;
+    --gold: #D4A853;
+    --gold-light: #FDF6E9;
+    --dark: #1A1A2E;
+    --text: #2D2D2D;
+    --muted: #6B6B7B;
+    --bg: #FAF8F5;
+    --white: #FFFFFF;
+    --border: #E8E0D8;
+    --green: #2D7A4F;
+    --green-light: #E8F5EE;
+    --red-light: #FFF0F2;
+    --shadow: 0 4px 20px rgba(192, 50, 75, 0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--dark) 0%, #2A1520 60%, var(--cherry-dark) 100%);
+    color: white;
+    padding: 32px 24px 28px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .header-badge {
+    display: inline-block;
+    background: var(--cherry);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-size: clamp(22px, 5vw, 34px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .header-sub {
+    font-size: 14px;
+    opacity: 0.7;
+    letter-spacing: 0.5px;
+  }
+
+  /* TABS */
+  .tabs-wrap {
+    background: var(--dark);
+    padding: 0 16px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs-wrap::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 14px 18px 12px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.8); }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  /* MAIN */
+  .main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  .step { display: none; }
+  .step.active { display: block; }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  /* PARTICIPANT TABS */
+  .p-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .p-tab {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    cursor: pointer;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .p-tab.active {
+    border-color: var(--cherry);
+    background: var(--cherry-light);
+    color: var(--cherry);
+  }
+
+  /* INPUT ROWS */
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .input-row:last-child { border-bottom: none; }
+  .input-label {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .input-hint {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .input-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .input-field input {
+    width: 130px;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: right;
+    color: var(--dark);
+    background: var(--bg);
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  .input-field input:focus {
+    outline: none;
+    border-color: var(--cherry);
+    background: var(--white);
+  }
+  .input-field input::-webkit-outer-spin-button,
+  .input-field input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .currency {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+    min-width: 28px;
+  }
+
+  /* SECTION HEADERS IN INPUTS */
+  .section-header {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--cherry);
+    padding: 16px 0 8px;
+    border-bottom: 1px solid var(--cherry-light);
+    margin-bottom: 4px;
+  }
+
+  /* RESULT BOX */
+  .result-box {
+    background: linear-gradient(135deg, var(--dark), var(--cherry-dark));
+    border-radius: 14px;
+    padding: 24px;
+    color: white;
+    margin-top: 24px;
+    text-align: center;
+  }
+  .result-label {
+    font-size: 13px;
+    opacity: 0.7;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .result-value {
+    font-size: clamp(28px, 7vw, 44px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--gold);
+  }
+  .result-sub {
+    font-size: 13px;
+    opacity: 0.6;
+    margin-top: 6px;
+  }
+
+  /* STRUCTURE TABLE */
+  .struct-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+  .struct-table th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .struct-table td {
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .struct-table tr:last-child td { border-bottom: none; }
+
+  .bar-wrap { width: 100%; background: var(--bg); border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+
+  .badge-ok {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--green-light);
+    color: var(--green);
+  }
+  .badge-warn {
+    background: #FFF3CD;
+    color: #856404;
+  }
+  .badge-bad {
+    background: var(--red-light);
+    color: var(--cherry);
+  }
+
+  /* IDEAL MODEL */
+  .ideal-note {
+    background: var(--gold-light);
+    border: 1px solid #E8CFA0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #5A4020;
+    margin-top: 16px;
+    line-height: 1.6;
+  }
+  .ideal-note strong { color: var(--gold); }
+
+  /* SERVICE CALCULATOR */
+  .service-block {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .service-block-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--cherry);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .inline-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--border);
+    flex-wrap: wrap;
+  }
+  .inline-row:last-child { border-bottom: none; }
+  .inline-label {
+    font-size: 13px;
+    color: var(--text);
+    flex: 1;
+    min-width: 140px;
+  }
+  .inline-input {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .inline-input input {
+    width: 90px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+    color: var(--dark);
+    background: var(--white);
+    -moz-appearance: textfield;
+  }
+  .inline-input input:focus { outline: none; border-color: var(--cherry); }
+  .inline-input input::-webkit-outer-spin-button,
+  .inline-input input::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .cost-result {
+    background: var(--cherry-light);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .cost-label { font-size: 14px; font-weight: 600; color: var(--cherry-dark); }
+  .cost-value { font-size: 24px; font-weight: 800; color: var(--cherry); }
+
+  /* PRICE FORMULA */
+  .formula-box {
+    background: linear-gradient(135deg, var(--gold-light), #FFF);
+    border: 2px solid var(--gold);
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .formula-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .formula-eq {
+    font-size: clamp(14px, 3vw, 18px);
+    font-weight: 700;
+    color: var(--dark);
+    font-family: 'Courier New', monospace;
+  }
+  .formula-eq span { color: var(--cherry); }
+
+  /* COMPARE TABLE */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .compare-table th {
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .compare-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-table th:first-child, .compare-table td:first-child {
+    background: var(--bg);
+    color: var(--muted);
+    font-weight: 600;
+    width: 35%;
+  }
+  .compare-table th.p1 { background: var(--cherry-light); color: var(--cherry-dark); }
+  .compare-table th.p2 { background: #E8F0FE; color: #1A56B0; }
+  .compare-table td.p1 { background: #FFFBFC; font-weight: 600; color: var(--dark); }
+  .compare-table td.p2 { background: #FAFCFF; font-weight: 600; color: var(--dark); }
+
+  /* ACTION BUTTON */
+  .calc-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--cherry), var(--cherry-dark));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 20px;
+    letter-spacing: 0.3px;
+    box-shadow: 0 4px 16px rgba(192,50,75,0.3);
+    transition: all 0.2s;
+  }
+  .calc-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(192,50,75,0.4);
+  }
+  .calc-btn:active { transform: translateY(0); }
+
+  .nav-btns {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .btn-next {
+    flex: 1;
+    padding: 14px;
+    background: var(--cherry);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-next:hover { background: var(--cherry-dark); }
+  .btn-prev {
+    padding: 14px 20px;
+    background: none;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-prev:hover { border-color: var(--cherry); color: var(--cherry); }
+
+  /* PROGRESS */
+  .progress-bar {
+    display: flex;
+    gap: 6px;
+    padding: 16px 24px 0;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .progress-step {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+  .progress-step.done { background: var(--gold); }
+
+  /* SUMMARY CARD */
+  .summary-hero {
+    background: linear-gradient(135deg, var(--dark), #2A1520);
+    border-radius: 16px;
+    padding: 32px 24px;
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .summary-hero h2 {
+    font-size: clamp(18px, 4vw, 26px);
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .summary-hero p { font-size: 13px; opacity: 0.6; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .summary-item {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: left;
+  }
+  .summary-item-label {
+    font-size: 11px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+  .summary-item-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gold);
+  }
+
+  /* CTA BLOCK */
+  .cta-block {
+    background: linear-gradient(135deg, var(--cherry-light), var(--white));
+    border: 2px solid var(--cherry);
+    border-radius: 16px;
+    padding: 28px 24px;
+    text-align: center;
+    margin-top: 24px;
+  }
+  .cta-block h3 { font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+  .cta-block p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .cta-link {
+    display: inline-block;
+    background: var(--cherry);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(192,50,75,0.3);
+  }
+
+  /* NAME INPUT */
+  .name-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--dark);
+    background: var(--bg);
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+  .name-input:focus {
+    outline: none;
+    border-color: var(--cherry);
+    background: var(--white);
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 500px) {
+    .card { padding: 20px 16px; }
+    .input-field input { width: 110px; }
+    .header { padding: 24px 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">💄 Beauty Маніфест · Прямий ефір 12 березня</div>
+  <h1>Де твої гроші? 💰<br>Рахуємо LIVE</h1>
+  <p class="header-sub">Фінансовий калькулятор для власниць салонів краси</p>
+</div>
+
+<div style="background: var(--dark);">
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-step done" id="ps0"></div>
+    <div class="progress-step" id="ps1"></div>
+    <div class="progress-step" id="ps2"></div>
+    <div class="progress-step" id="ps3"></div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <button class="tab-btn active" onclick="goStep(0)">1️⃣ Точка 0</button>
+  <button class="tab-btn" onclick="goStep(1)">2️⃣ Структура</button>
+  <button class="tab-btn" onclick="goStep(2)">3️⃣ Собівартість</button>
+  <button class="tab-btn" onclick="goStep(3)">4️⃣ Ціна</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════════ STEP 0: ТОЧКА 0 ═══════════════════ -->
+<div class="step active" id="step0">
+
+  <div class="card">
+    <div class="card-title">👤 Учасниця</div>
+    <div class="card-desc">Введіть ім'я учасниці прямого ефіру</div>
+    <div class="p-tabs">
+      <div class="p-tab active" onclick="selectP(0)">Учасниця 1</div>
+      <div class="p-tab" onclick="selectP(1)">Учасниця 2</div>
+    </div>
+    <input class="name-input" type="text" id="name0" placeholder="Ім'я учасниці 1..." oninput="updateNames()" />
+    <input class="name-input" type="text" id="name1" placeholder="Ім'я учасниці 2..." oninput="updateNames()" style="display:none" />
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 Крок 1: Точка нуля</div>
+    <div class="card-desc">Введіть усі щомісячні витрати салону. Точка нуля — це сума, яку потрібно заробити, щоб просто не йти в мінус.</div>
+
+    <div class="section-header">🏢 Постійні витрати</div>
+    <div class="input-row">
+      <div><div class="input-label">Оренда приміщення</div></div>
+      <div class="input-field">
+        <input type="number" id="rent" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Комунальні послуги</div><div class="input-hint">Електрика, вода, інтернет, телефон</div></div>
+      <div class="input-field">
+        <input type="number" id="utilities" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+
+    <div class="section-header">👩‍💼 Зарплати</div>
+    <div class="input-row">
+      <div><div class="input-label">Зарплата майстрів (ФОП або % від виручки)</div></div>
+      <div class="input-field">
+        <input type="number" id="salMasters" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Зарплата адміністратора</div></div>
+      <div class="input-field">
+        <input type="number" id="salAdmin" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Зарплата власниці</div><div class="input-hint">Яку зарплату ти платиш сама собі?</div></div>
+      <div class="input-field">
+        <input type="number" id="salOwner" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+
+    <div class="section-header">📦 Інші витрати</div>
+    <div class="input-row">
+      <div><div class="input-label">Матеріали та витратники</div></div>
+      <div class="input-field">
+        <input type="number" id="materials" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Маркетинг та реклама</div></div>
+      <div class="input-field">
+        <input type="number" id="marketing" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Податки та бухгалтерія</div></div>
+      <div class="input-field">
+        <input type="number" id="taxes" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Інше (обслуговування, непередбачене)</div></div>
+      <div class="input-field">
+        <input type="number" id="other" value="" placeholder="0" oninput="calcZero()">
+        <span class="currency">₴/міс</span>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <div class="result-label">📍 Точка нуля</div>
+      <div class="result-value" id="zero-result">0 ₴</div>
+      <div class="result-sub">На стільки потрібно заробити щомісяця, щоб покрити всі витрати</div>
+    </div>
+
+    <div style="background: var(--gold-light); border: 1px solid #E8CFA0; border-radius: 10px; padding: 14px 16px; margin-top: 16px; font-size: 13px; color: #5A4020; line-height: 1.6;">
+      💡 <strong>Порівняння з виручкою:</strong> Також введи свою поточну місячну виручку, щоб побачити, скільки залишається після витрат.<br><br>
+      <div class="input-row" style="border:none; padding: 4px 0;">
+        <div><div class="input-label" style="color:#5A4020">Місячна виручка зараз</div></div>
+        <div class="input-field">
+          <input type="number" id="revenue" value="" placeholder="0" oninput="calcZero()">
+          <span class="currency" style="color:#5A4020">₴/міс</span>
+        </div>
+      </div>
+      <div id="profit-row" style="margin-top:10px; font-size:14px; font-weight:700; display:none"></div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-next" onclick="goStep(1)">Далі: Структура витрат →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ STEP 1: СТРУКТУРА ═══════════════════ -->
+<div class="step" id="step1">
+
+  <div class="card">
+    <div class="card-title">📐 Крок 2: Структура витрат</div>
+    <div class="card-desc">Порівнюємо твою структуру з ідеальною моделлю Cherry. Введи місячну виручку, щоб побачити відсотки.</div>
+
+    <div class="input-row" style="padding-bottom: 16px; margin-bottom: 8px;">
+      <div><div class="input-label" style="font-size:15px; font-weight:700;">Місячна виручка салону</div></div>
+      <div class="input-field">
+        <input type="number" id="rev2" value="" placeholder="0" oninput="calcStruct()" style="width:150px;">
+        <span class="currency">₴</span>
+      </div>
+    </div>
+
+    <table class="struct-table">
+      <thead>
+        <tr>
+          <th>Категорія витрат</th>
+          <th>Сума, ₴</th>
+          <th>% від виручки</th>
+          <th>Норма Cherry</th>
+          <th>Статус</th>
+        </tr>
+      </thead>
+      <tbody id="struct-rows"></tbody>
+    </table>
+
+    <div class="ideal-note">
+      🍒 <strong>Ідеальна модель Cherry (Вікторія Близнюк):</strong><br>
+      Зарплати майстрів — <strong>40–45%</strong> · Оренда — <strong>до 10%</strong> · Матеріали — <strong>10–12%</strong> · Маркетинг — <strong>10–11%</strong> · Прибуток власниці — <strong>18–25%</strong>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goStep(0)">← Назад</button>
+    <button class="btn-next" onclick="goStep(2)">Далі: Собівартість →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ STEP 2: СОБІВАРТІСТЬ ═══════════════════ -->
+<div class="step" id="step2">
+
+  <div class="card">
+    <div class="card-title">🧮 Крок 3: Собівартість послуги</div>
+    <div class="card-desc">Скільки реально коштує виконати одну послугу? Введіть дані — і ми порахуємо справжню собівартість.</div>
+
+    <div class="service-block">
+      <div class="service-block-title">💅 Яку послугу рахуємо?
+        <input type="text" id="svcName" placeholder="Наприклад: Манікюр з покриттям" style="font-size:13px; font-weight:600; border:1.5px solid var(--border); border-radius:6px; padding:6px 10px; color:var(--dark); background:var(--white); flex:1; min-width:180px;">
+      </div>
+
+      <div class="inline-row">
+        <div class="inline-label">⏱️ Тривалість послуги</div>
+        <div class="inline-input">
+          <input type="number" id="svcDuration" value="" placeholder="90" oninput="calcCost()">
+          <span class="currency">хв</span>
+        </div>
+      </div>
+
+      <div class="section-header" style="padding-top:8px">💄 Матеріали</div>
+      <div class="inline-row">
+        <div class="inline-label">Матеріали на 1 клієнта</div>
+        <div class="inline-input">
+          <input type="number" id="costMat" value="" placeholder="0" oninput="calcCost()">
+          <span class="currency">₴</span>
+        </div>
+      </div>
+
+      <div class="section-header" style="padding-top:8px">👩 Майстер</div>
+      <div class="inline-row">
+        <div class="inline-label">Ставка майстра на годину</div>
+        <div class="inline-input">
+          <input type="number" id="masterRate" value="" placeholder="0" oninput="calcCost()">
+          <span class="currency">₴/год</span>
+        </div>
+      </div>
+
+      <div class="section-header" style="padding-top:8px">🏢 Оренда та комуналка</div>
+      <div class="inline-row">
+        <div class="inline-label">Оренда + комуналка на місяць</div>
+        <div class="inline-input">
+          <input type="number" id="rentMonth" value="" placeholder="0" oninput="calcCost()">
+          <span class="currency">₴/міс</span>
+        </div>
+      </div>
+      <div class="inline-row">
+        <div class="inline-label">Робочих годин на місяць</div>
+        <div class="inline-input">
+          <input type="number" id="workHours" value="160" placeholder="160" oninput="calcCost()">
+          <span class="currency">год</span>
+        </div>
+      </div>
+
+      <div class="section-header" style="padding-top:8px">📦 Інше</div>
+      <div class="inline-row">
+        <div class="inline-label">Інші прямі витрати</div>
+        <div class="inline-input">
+          <input type="number" id="costOther" value="" placeholder="0" oninput="calcCost()">
+          <span class="currency">₴</span>
+        </div>
+      </div>
+
+      <div class="cost-result">
+        <div>
+          <div style="font-size:11px; color:var(--cherry); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px">Собівартість послуги</div>
+          <div class="cost-value" id="cost-result">0 ₴</div>
+        </div>
+        <div id="cost-breakdown" style="font-size:12px; color:var(--cherry-dark); line-height:1.8; text-align:right"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goStep(1)">← Назад</button>
+    <button class="btn-next" onclick="goStep(3)">Далі: Формула ціни →</button>
+  </div>
+</div>
+
+<!-- ═══════════════════ STEP 3: ЦІНА ═══════════════════ -->
+<div class="step" id="step3">
+
+  <div class="formula-box">
+    <div class="formula-title">📐 Формула правильної ціни</div>
+    <div class="formula-eq">Ціна = Собівартість ÷ <span>(1 − Маржа %)</span></div>
+    <div style="font-size:12px; color:var(--muted); margin-top:8px">Маржа — це твій прибуток у відсотках від ціни продажу</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💸 Крок 4: Правильна ціна</div>
+    <div class="card-desc">Введіть собівартість і бажану маржу, щоб отримати правильну ціну послуги.</div>
+
+    <div class="input-row">
+      <div><div class="input-label">Собівартість послуги</div><div class="input-hint">Автозаповнено з Кроку 3</div></div>
+      <div class="input-field">
+        <input type="number" id="priceCost" placeholder="0" oninput="calcPrice()">
+        <span class="currency">₴</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Поточна ціна у прайсі</div></div>
+      <div class="input-field">
+        <input type="number" id="priceNow" placeholder="0" oninput="calcPrice()">
+        <span class="currency">₴</span>
+      </div>
+    </div>
+    <div class="input-row">
+      <div><div class="input-label">Бажана маржа (прибуток)</div><div class="input-hint">Рекомендовано: 30–50%</div></div>
+      <div class="input-field">
+        <input type="number" id="margin" value="35" placeholder="35" min="1" max="90" oninput="calcPrice()">
+        <span class="currency">%</span>
+      </div>
+    </div>
+
+    <div class="result-box" style="margin-top:20px">
+      <div class="result-label">✅ Рекомендована ціна</div>
+      <div class="result-value" id="price-result">0 ₴</div>
+      <div class="result-sub" id="price-diff"></div>
+    </div>
+
+    <div id="price-insight" style="margin-top:16px; padding:14px 16px; border-radius:10px; font-size:13px; line-height:1.6; display:none"></div>
+  </div>
+
+  <!-- ПОРІВНЯННЯ ДВОХ УЧАСНИЦЬ -->
+  <div class="card">
+    <div class="card-title">📊 Порівняння учасниць ефіру</div>
+    <div class="card-desc">Зберігайте результати обох учасниць і порівнюйте — щоб аудиторія бачила різницю.</div>
+
+    <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap">
+      <button onclick="saveParticipant()" style="flex:1; padding:12px; background:var(--cherry-light); color:var(--cherry); border:1.5px solid var(--cherry); border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; min-width:160px;">
+        💾 Зберегти поточну учасницю
+      </button>
+      <button onclick="clearSaved()" style="padding:12px 16px; background:none; color:var(--muted); border:1.5px solid var(--border); border-radius:8px; font-weight:600; font-size:13px; cursor:pointer;">
+        🗑️ Очистити
+      </button>
+    </div>
+
+    <div id="compare-area" style="display:none">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Показник</th>
+            <th class="p1" id="th-p1">Учасниця 1</th>
+            <th class="p2" id="th-p2">Учасниця 2</th>
+          </tr>
+        </thead>
+        <tbody id="compare-tbody"></tbody>
+      </table>
+    </div>
+    <div id="no-compare" style="text-align:center; padding:20px; color:var(--muted); font-size:13px">
+      Збережіть дані обох учасниць, щоб побачити порівняння
+    </div>
+  </div>
+
+  <!-- ПІДСУМОК -->
+  <div class="summary-hero" id="summary-hero" style="display:none">
+    <h2 id="summary-name">Підсумок</h2>
+    <p>Фінансова картина вашого салону</p>
+    <div class="summary-grid" id="summary-grid"></div>
+  </div>
+
+  <div class="cta-block">
+    <h3>🌸 Beauty Маніфест</h3>
+    <p>Хочеш системно розібратись у фінансах і вивести салон на новий рівень? Заповни анкету — і отримай безкоштовний аудит від команди Вікторії + місце за найнижчою ціною</p>
+    <a href="#" class="cta-link">📋 Заповнити анкету →</a>
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn-prev" onclick="goStep(2)">← Назад</button>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ═══════════ STATE ═══════════
+let currentStep = 0;
+let currentP = 0;
+const participants = [{}, {}];
+
+// ═══════════ NAVIGATION ═══════════
+function goStep(n) {
+  document.querySelectorAll('.step').forEach((s,i) => {
+    s.classList.toggle('active', i === n);
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', i === n);
+  });
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('ps'+i).classList.toggle('done', i <= n);
+  }
+  currentStep = n;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+
+  if (n === 1) { syncStructureFromStep0(); calcStruct(); }
+  if (n === 3) { syncCostToPrice(); calcPrice(); }
+  if (n === 3) { renderSummary(); }
+}
+
+function selectP(idx) {
+  saveCurrentToState();
+  currentP = idx;
+  document.querySelectorAll('.p-tab').forEach((t,i) => t.classList.toggle('active', i===idx));
+  // show/hide name inputs
+  document.getElementById('name0').style.display = idx===0 ? '' : 'none';
+  document.getElementById('name1').style.display = idx===1 ? '' : 'none';
+  loadFromState();
+}
+
+function updateNames() {
+  const n0 = document.getElementById('name0').value || 'Учасниця 1';
+  const n1 = document.getElementById('name1').value || 'Учасниця 2';
+  document.querySelectorAll('.p-tab')[0].textContent = n0;
+  document.querySelectorAll('.p-tab')[1].textContent = n1;
+  document.getElementById('th-p1').textContent = n0;
+  document.getElementById('th-p2').textContent = n1;
+}
+
+// ═══════════ STEP 0: ТОЧКА 0 ═══════════
+const fields0 = ['rent','utilities','salMasters','salAdmin','salOwner','materials','marketing','taxes','other','revenue'];
+
+function saveCurrentToState() {
+  const p = participants[currentP];
+  fields0.forEach(f => {
+    const el = document.getElementById(f);
+    if (el) p[f] = el.value;
+  });
+  p['name'] = document.getElementById('name'+currentP).value;
+  // cost fields
+  ['svcName','svcDuration','costMat','masterRate','rentMonth','workHours','costOther',
+   'priceCost','priceNow','margin','rev2'].forEach(f => {
+    const el = document.getElementById(f);
+    if (el) p[f] = el.value;
+  });
+}
+
+function loadFromState() {
+  const p = participants[currentP];
+  fields0.forEach(f => {
+    const el = document.getElementById(f);
+    if (el) el.value = p[f] || '';
+  });
+  ['svcName','svcDuration','costMat','masterRate','rentMonth','workHours','costOther',
+   'priceCost','priceNow','margin','rev2'].forEach(f => {
+    const el = document.getElementById(f);
+    if (el) el.value = p[f] || (f==='margin'?'35':(f==='workHours'?'160':''));
+  });
+  calcZero();
+  calcStruct();
+  calcCost();
+  calcPrice();
+}
+
+function val(id) {
+  return parseFloat(document.getElementById(id)?.value) || 0;
+}
+
+function calcZero() {
+  const total = val('rent') + val('utilities') + val('salMasters') + val('salAdmin') +
+                val('salOwner') + val('materials') + val('marketing') + val('taxes') + val('other');
+  document.getElementById('zero-result').textContent = fmt(total) + ' ₴';
+
+  const rev = val('revenue');
+  const profitRow = document.getElementById('profit-row');
+  if (rev > 0) {
+    profitRow.style.display = 'block';
+    const diff = rev - total;
+    if (diff >= 0) {
+      profitRow.innerHTML = `✅ Виручка покриває витрати. Залишок: <span style="color:var(--green)">${fmt(diff)} ₴</span>`;
+    } else {
+      profitRow.innerHTML = `🚨 Виручки не вистачає. Дефіцит: <span style="color:var(--cherry)">${fmt(Math.abs(diff))} ₴</span>`;
+    }
+  } else {
+    profitRow.style.display = 'none';
+  }
+  // auto-fill revenue in step 2
+  const rev2 = document.getElementById('rev2');
+  if (rev2 && !rev2.value && rev > 0) rev2.value = rev;
+}
+
+// ═══════════ STEP 1: СТРУКТУРА ═══════════
+const structDefs = [
+  { label: '👩 Зарплати майстрів',  field: 'salMasters', min: 40, max: 45, color: '#C0324B' },
+  { label: '🏢 Оренда приміщення',  field: 'rent',       min: 0,  max: 10, color: '#E07B39' },
+  { label: '📦 Матеріали',          field: 'materials',  min: 10, max: 12, color: '#D4A853' },
+  { label: '📢 Маркетинг',          field: 'marketing',  min: 10, max: 11, color: '#6B88C0' },
+  { label: '💰 Зарплата власниці',  field: 'salOwner',   min: 18, max: 25, color: '#2D7A4F' },
+  { label: '🔧 Ком. послуги',       field: 'utilities',  min: 0,  max: 8,  color: '#8B6BA0' },
+  { label: '📊 Адмін + бухгалтер',  field: 'salAdmin',   min: 0,  max: 10, color: '#607D8B' },
+  { label: '💼 Податки',            field: 'taxes',      min: 0,  max: 8,  color: '#795548' },
+  { label: '➕ Інші витрати',       field: 'other',      min: 0,  max: 5,  color: '#9E9E9E' },
+];
+
+function syncStructureFromStep0() {
+  const rev = val('revenue');
+  if (rev > 0 && !document.getElementById('rev2').value) {
+    document.getElementById('rev2').value = rev;
+  }
+}
+
+function calcStruct() {
+  const rev = val('rev2');
+  const tbody = document.getElementById('struct-rows');
+  tbody.innerHTML = '';
+
+  structDefs.forEach(def => {
+    const amount = val(def.field);
+    const pct = rev > 0 ? (amount / rev * 100) : 0;
+    const inNorm = pct >= def.min && pct <= def.max;
+    const overNorm = def.max > 0 && pct > def.max;
+    const barW = rev > 0 ? Math.min(pct / (def.max * 1.5 || 20) * 100, 100) : 0;
+
+    let badge, badgeClass;
+    if (rev === 0 || amount === 0) {
+      badge = '—'; badgeClass = '';
+    } else if (def.max === 0) {
+      badge = '—'; badgeClass = '';
+    } else if (inNorm) {
+      badge = '✅ Норма'; badgeClass = 'badge-ok';
+    } else if (overNorm) {
+      badge = '⚠️ Завищено'; badgeClass = 'badge-bad';
+    } else {
+      badge = '🔻 Нижче', badgeClass = 'badge-warn';
+    }
+
+    const normText = def.max > 0 ? `${def.min}–${def.max}%` : '—';
+
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-weight:600">${def.label}</td>
+        <td style="font-weight:700">${amount > 0 ? fmt(amount) + ' ₴' : '—'}</td>
+        <td>
+          <div style="font-weight:700; margin-bottom:4px; color:${overNorm ? 'var(--cherry)' : 'var(--dark)'}">${rev > 0 && amount > 0 ? pct.toFixed(1) + '%' : '—'}</div>
+          <div class="bar-wrap"><div class="bar-fill" style="width:${barW}%; background:${def.color}"></div></div>
+        </td>
+        <td style="color:var(--muted)">${normText}</td>
+        <td><span class="badge-ok ${badgeClass}">${badge}</span></td>
+      </tr>`;
+  });
+}
+
+// ═══════════ STEP 2: СОБІВАРТІСТЬ ═══════════
+function calcCost() {
+  const dur = val('svcDuration'); // minutes
+  const mat = val('costMat');
+  const rate = val('masterRate');
+  const rentM = val('rentMonth');
+  const hours = val('workHours') || 160;
+  const oth = val('costOther');
+
+  const masterCost = rate * (dur / 60);
+  const rentHour = rentM / (hours * 60);
+  const rentCost = rentHour * dur;
+  const total = mat + masterCost + rentCost + oth;
+
+  document.getElementById('cost-result').textContent = fmt(total) + ' ₴';
+
+  const breakdown = document.getElementById('cost-breakdown');
+  if (total > 0) {
+    breakdown.innerHTML =
+      `Матеріали: ${fmt(mat)} ₴<br>` +
+      `Майстер: ${fmt(masterCost)} ₴<br>` +
+      `Оренда: ${fmt(rentCost)} ₴<br>` +
+      (oth > 0 ? `Інше: ${fmt(oth)} ₴` : '');
+  }
+
+  // auto-fill in step 3
+  const priceCost = document.getElementById('priceCost');
+  if (priceCost && total > 0) {
+    priceCost.value = Math.round(total);
+    calcPrice();
+  }
+}
+
+// ═══════════ STEP 3: ЦІНА ═══════════
+function syncCostToPrice() {
+  const costEl = document.getElementById('cost-result');
+  const priceCostEl = document.getElementById('priceCost');
+  if (costEl && priceCostEl) {
+    const num = parseFloat(costEl.textContent.replace(/[^\d.]/g, ''));
+    if (num > 0) priceCostEl.value = Math.round(num);
+  }
+}
+
+function calcPrice() {
+  const cost = val('priceCost');
+  const margin = val('margin') / 100;
+  const now = val('priceNow');
+
+  if (margin >= 1 || margin < 0) return;
+  const recommended = margin > 0 ? cost / (1 - margin) : cost;
+
+  document.getElementById('price-result').textContent = fmt(recommended) + ' ₴';
+
+  const diffEl = document.getElementById('price-diff');
+  const insight = document.getElementById('price-insight');
+
+  if (now > 0) {
+    const diff = now - recommended;
+    if (Math.abs(diff) < 10) {
+      diffEl.textContent = '✅ Ціна відповідає розрахунку';
+      insight.style.display = 'block';
+      insight.style.background = 'var(--green-light)';
+      insight.style.color = 'var(--green)';
+      insight.textContent = '✅ Відмінно! Твоя поточна ціна вже правильна.';
+    } else if (diff < 0) {
+      diffEl.textContent = `⬆️ Рекомендована ціна вища на ${fmt(Math.abs(diff))} ₴`;
+      insight.style.display = 'block';
+      insight.style.background = 'var(--red-light)';
+      insight.style.color = 'var(--cherry)';
+      insight.innerHTML = `🚨 <strong>Ціна занижена!</strong> Ти відпрацьовуєш на ${fmt(Math.abs(diff))} ₴ дешевше за реальну вартість послуги. Це означає — ти втрачаєш гроші на кожному клієнті.`;
+    } else {
+      diffEl.textContent = `💰 Ціна вища за мінімум на ${fmt(diff)} ₴`;
+      insight.style.display = 'block';
+      insight.style.background = 'var(--green-light)';
+      insight.style.color = 'var(--green)';
+      insight.innerHTML = `✅ <strong>Добре!</strong> Поточна ціна вища за мінімально необхідну. Ти в плюсі.`;
+    }
+  } else {
+    diffEl.textContent = '';
+    insight.style.display = 'none';
+  }
+}
+
+// ═══════════ SAVE & COMPARE ═══════════
+const savedP = [null, null];
+
+function saveParticipant() {
+  saveCurrentToState();
+  const p = participants[currentP];
+  const cost = parseFloat(document.getElementById('cost-result')?.textContent) || 0;
+  const price = parseFloat(document.getElementById('price-result')?.textContent) || 0;
+  const zero = parseFloat(document.getElementById('zero-result')?.textContent) || 0;
+
+  savedP[currentP] = {
+    name: document.getElementById('name'+currentP).value || ('Учасниця '+(currentP+1)),
+    zero: zero,
+    revenue: val('revenue') || val('rev2'),
+    cost: cost,
+    priceNow: val('priceNow'),
+    priceRec: parseFloat(document.getElementById('price-result')?.textContent) || 0,
+    margin: val('margin'),
+  };
+
+  renderCompare();
+
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = '✅ Збережено!';
+  setTimeout(() => btn.textContent = orig, 2000);
+}
+
+function clearSaved() {
+  savedP[0] = null; savedP[1] = null;
+  renderCompare();
+}
+
+function renderCompare() {
+  const area = document.getElementById('compare-area');
+  const noComp = document.getElementById('no-compare');
+  const tbody = document.getElementById('compare-tbody');
+
+  const has0 = savedP[0] !== null;
+  const has1 = savedP[1] !== null;
+
+  if (!has0 && !has1) {
+    area.style.display = 'none';
+    noComp.style.display = 'block';
+    return;
+  }
+
+  area.style.display = 'block';
+  noComp.style.display = 'none';
+
+  const rows = [
+    ['📍 Точка нуля', 'zero', '₴'],
+    ['💰 Місячна виручка', 'revenue', '₴'],
+    ['🧮 Собівартість послуги', 'cost', '₴'],
+    ['💵 Ціна зараз', 'priceNow', '₴'],
+    ['✅ Рекомендована ціна', 'priceRec', '₴'],
+    ['📈 Маржа', 'margin', '%'],
+  ];
+
+  tbody.innerHTML = '';
+  rows.forEach(([label, key, unit]) => {
+    const v0 = has0 ? savedP[0][key] : null;
+    const v1 = has1 ? savedP[1][key] : null;
+    tbody.innerHTML += `
+      <tr>
+        <td>${label}</td>
+        <td class="p1">${v0 !== null ? (unit==='₴' ? fmt(v0)+' ₴' : v0+'%') : '—'}</td>
+        <td class="p2">${v1 !== null ? (unit==='₴' ? fmt(v1)+' ₴' : v1+'%') : '—'}</td>
+      </tr>`;
+  });
+
+  if (has0) {
+    document.getElementById('th-p1').textContent = savedP[0].name;
+  }
+  if (has1) {
+    document.getElementById('th-p2').textContent = savedP[1].name;
+  }
+}
+
+function renderSummary() {
+  const zero = parseFloat(document.getElementById('zero-result')?.textContent) || 0;
+  const rev = val('revenue') || val('rev2');
+  const cost = parseFloat(document.getElementById('cost-result')?.textContent) || 0;
+  const priceRec = parseFloat(document.getElementById('price-result')?.textContent) || 0;
+  const name = document.getElementById('name'+currentP)?.value || 'Учасниця';
+
+  if (zero > 0 || rev > 0 || cost > 0) {
+    const hero = document.getElementById('summary-hero');
+    hero.style.display = 'block';
+    document.getElementById('summary-name').textContent = '📊 ' + name;
+    const grid = document.getElementById('summary-grid');
+    grid.innerHTML = `
+      <div class="summary-item"><div class="summary-item-label">Точка нуля</div><div class="summary-item-value">${fmt(zero)} ₴</div></div>
+      ${rev > 0 ? `<div class="summary-item"><div class="summary-item-label">Виручка</div><div class="summary-item-value">${fmt(rev)} ₴</div></div>` : ''}
+      ${cost > 0 ? `<div class="summary-item"><div class="summary-item-label">Собівартість</div><div class="summary-item-value">${fmt(cost)} ₴</div></div>` : ''}
+      ${priceRec > 0 ? `<div class="summary-item"><div class="summary-item-label">Рекомендована ціна</div><div class="summary-item-value">${fmt(priceRec)} ₴</div></div>` : ''}
+    `;
+  }
+}
+
+// ═══════════ UTILS ═══════════
+function fmt(n) {
+  if (!n || isNaN(n)) return '0';
+  return Math.round(n).toLocaleString('uk-UA');
+}
+
+// Init
+calcZero();
+updateNames();
+</script>
+</body>
+</html>
